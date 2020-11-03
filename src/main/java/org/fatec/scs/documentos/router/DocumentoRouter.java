@@ -1,9 +1,11 @@
 package org.fatec.scs.documentos.router;
 
 import org.fatec.scs.documentos.dto.DocumentoDTO;
+import org.fatec.scs.documentos.dto.Paginas;
 import org.fatec.scs.documentos.dto.PastaResponse;
 import org.fatec.scs.documentos.dto.request.ReconheceRequest;
 import org.fatec.scs.documentos.dto.request.TreinaRequest;
+import org.fatec.scs.documentos.dto.response.DocumentoList;
 import org.fatec.scs.documentos.dto.response.PessoaDTO;
 import org.fatec.scs.documentos.handler.DocumentoHandler;
 import org.fatec.scs.documentos.model.Pasta;
@@ -44,8 +46,11 @@ public class DocumentoRouter {
 		))
 		.POST("/reconhecePessoa", req ->
 			req.bodyToMono(ReconheceRequest.class).flatMap(reconheceRequest ->
-					documentoHandler.reconhecePessoa(reconheceRequest)
+				documentoHandler.reconhecePessoa(reconheceRequest)
 		))
+		.GET("/reconhecePessoaTeste", req ->
+			documentoHandler.reconhecePessoaTeste()
+		)
 		.POST("/cadastraPessoa", req ->
 			req.bodyToMono(TreinaRequest.class).flatMap(treinaRequest ->
 					documentoHandler.cadastraPessoa(treinaRequest)
@@ -63,6 +68,14 @@ public class DocumentoRouter {
 		.GET("/buscaPorEmail/{email}", req ->
 			ok().body(documentoService.buscaPorEmail(req.pathVariable("email")),
 			Pessoa.class
+		))
+		.GET("/documentosNaPasta/{idPasta}", req ->
+			ok().body(documentoService.documentosNaPasta(req.pathVariable("idPasta")),
+			DocumentoList.class
+		))
+		.GET("/documentoArquivo/{idDocumento}", req ->
+			ok().body(documentoService.imagemDoDocumento(req.pathVariable("idDocumento")),
+				Paginas.class
 		))
 		.build();
 	}

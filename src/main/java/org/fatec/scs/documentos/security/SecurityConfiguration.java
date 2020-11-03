@@ -21,6 +21,7 @@ public class SecurityConfiguration {
 		
 		return http.authorizeExchange()
 				.pathMatchers("/reconhecePessoa").permitAll()
+				.pathMatchers("/reconhecePessoaTeste").permitAll()
 				.pathMatchers("/cadastraPessoa").permitAll()
 				.pathMatchers("/pasta").permitAll()
 				.pathMatchers("/**").authenticated()

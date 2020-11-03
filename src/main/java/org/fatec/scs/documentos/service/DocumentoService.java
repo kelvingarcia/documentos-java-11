@@ -1,10 +1,13 @@
 package org.fatec.scs.documentos.service;
 
-import org.fatec.scs.documentos.dto.DocumentoDTO;
-import org.fatec.scs.documentos.dto.PastaDTO;
-import org.fatec.scs.documentos.dto.PastaResponse;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.pdfbox.tools.imageio.ImageIOUtil;
+import org.fatec.scs.documentos.dto.*;
 import org.fatec.scs.documentos.dto.request.ReconheceRequest;
 import org.fatec.scs.documentos.dto.request.TreinaRequest;
+import org.fatec.scs.documentos.dto.response.DocumentoList;
 import org.fatec.scs.documentos.dto.response.PessoaDTO;
 import org.fatec.scs.documentos.dto.response.Reconhecimento;
 import org.fatec.scs.documentos.enums.FormatoDocumento;
@@ -20,6 +23,9 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,7 +52,7 @@ public class DocumentoService {
 	}
 
 	public Mono<Pasta> salvarDocumento(DocumentoDTO documentoDto) {
-		return documentoRepository.save(new Documento(documentoDto.getNome(), documentoDto.getArquivo()))
+		return documentoRepository.save(new Documento(documentoDto))
 			.flatMap(documento -> pastaRepository.findById(documentoDto.getIdPasta()).flatMap(pasta -> pastaRepository.save(pasta.addDocumento(documento.getId()))));
 	}
 
@@ -80,5 +86,35 @@ public class DocumentoService {
 				.uri("/email/{email}", email)
 				.retrieve()
 				.bodyToMono(Pessoa.class);
+	}
+
+	public Flux<DocumentoList> documentosNaPasta(String idPasta){
+		return this.pastaRepository.findById(idPasta)
+				.flatMapMany(pasta -> this.documentoRepository.findAllById(pasta.getDocumentos()))
+				.map(documento -> new DocumentoList(documento));
+	}
+
+	public Mono<Paginas> imagemDoDocumento(String idDocumento){
+		return documentoRepository.findById(idDocumento)
+			.map(documento -> {
+				Paginas paginas = new Paginas();
+				try {
+					PDDocument document = PDDocument.load(documento.getArquivo());
+					PDFRenderer pdfRenderer = new PDFRenderer(document);
+					for (int page = 0; page < document.getNumberOfPages(); ++page) {
+						BufferedImage bim = pdfRenderer.renderImageWithDPI(
+								page, 300, ImageType.RGB);
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						ImageIO.write( bim, "png", baos);
+						baos.flush();
+						paginas.getArquivo().add(new Imagem(baos.toByteArray()));
+						baos.close();
+					}
+					return paginas;
+				} catch (Exception e) {
+					e.printStackTrace();
+					return paginas;
+				}
+			});
 	}
 }

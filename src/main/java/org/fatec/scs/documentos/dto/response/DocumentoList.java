@@ -1,22 +1,21 @@
-package org.fatec.scs.documentos.dto;
+package org.fatec.scs.documentos.dto.response;
 
 import org.fatec.scs.documentos.model.Documento;
 
 import java.time.format.DateTimeFormatter;
 
-public class DocumentoDTO {
+public class DocumentoList {
+    private String id;
     private String nome;
-    private byte[] arquivo;
     private String descricao;
     private String dataHora;
-    private String idPasta;
 
-    public DocumentoDTO() {
+    public DocumentoList() {
     }
 
-    public DocumentoDTO(Documento documento){
+    public DocumentoList(Documento documento) {
+        this.id = documento.getId();
         this.nome = documento.getNome();
-        this.arquivo = documento.getArquivo();
         this.descricao = documento.getDescricao();
         this.dataHora = documento.getDataHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
     }
@@ -29,14 +28,6 @@ public class DocumentoDTO {
         this.nome = nome;
     }
 
-    public byte[] getArquivo() {
-        return arquivo;
-    }
-
-    public void setArquivo(byte[] arquivo) {
-        this.arquivo = arquivo;
-    }
-
     public String getDescricao() {
         return descricao;
     }
@@ -45,19 +36,19 @@ public class DocumentoDTO {
         this.descricao = descricao;
     }
 
-    public String getIdPasta() {
-        return idPasta;
-    }
-
-    public void setIdPasta(String idPasta) {
-        this.idPasta = idPasta;
-    }
-
     public String getDataHora() {
         return dataHora;
     }
 
     public void setDataHora(String dataHora) {
         this.dataHora = dataHora;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
