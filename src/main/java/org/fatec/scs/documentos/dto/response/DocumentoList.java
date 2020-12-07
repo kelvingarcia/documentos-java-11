@@ -9,6 +9,7 @@ public class DocumentoList {
     private String nome;
     private String descricao;
     private String dataHora;
+    private boolean assinado;
 
     public DocumentoList() {
     }
@@ -18,6 +19,7 @@ public class DocumentoList {
         this.nome = documento.getNome();
         this.descricao = documento.getDescricao();
         this.dataHora = documento.getDataHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        this.assinado = false;
     }
 
     public String getNome() {
@@ -50,5 +52,13 @@ public class DocumentoList {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public boolean isAssinado() {
+        return assinado;
+    }
+
+    public void setAssinado(boolean assinado) {
+        this.assinado = assinado;
     }
 }

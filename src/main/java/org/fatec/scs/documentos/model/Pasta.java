@@ -15,14 +15,17 @@ public class Pasta {
 	private List<String> administradores = new ArrayList<>();
 	private List<String> membros;
 	private List<String> documentos = new ArrayList<>();
+	private boolean statusAtivo;
 	
 	public Pasta() {
 	}
 
-	public Pasta(String nomePasta, String admin, String descricao, List<String> membros) {
+	public Pasta(String id, String nomePasta, String admin, String descricao, List<String> membros) {
+		this.id = id;
 		this.nomePasta = nomePasta;
 		this.descricao = descricao;
 		this.membros = membros;
+		this.statusAtivo = true;
 		this.administradores.add(admin);
 	}
 	
@@ -63,6 +66,14 @@ public class Pasta {
 
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
+	}
+
+	public boolean isStatusAtivo() {
+		return statusAtivo;
+	}
+
+	public void setStatusAtivo(boolean statusAtivo) {
+		this.statusAtivo = statusAtivo;
 	}
 
 	public Pasta addDocumento(String documento) {

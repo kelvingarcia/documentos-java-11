@@ -3,6 +3,7 @@ package org.fatec.scs.documentos.dto;
 import java.util.List;
 
 public class PastaDTO {
+    private String id;
     private String nome;
     private String descricao;
     private List<String> emails;
@@ -38,5 +39,13 @@ public class PastaDTO {
 
     public void setEmails(List<String> emails) {
         this.emails = emails;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

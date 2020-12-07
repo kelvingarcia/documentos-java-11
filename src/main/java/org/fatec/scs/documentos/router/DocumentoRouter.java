@@ -60,22 +60,29 @@ public class DocumentoRouter {
 			documentoService.usuarioLogado(name)),
 			PessoaDTO.class
 		))
-		.GET("/listaDePastas", req ->
-			ok().body(req.principal().map(Principal::getName).flatMapMany(name ->
-			documentoService.listaDePastas(name)),
+		.GET("/listaDePastas/{email}", req ->
+			ok().body(documentoService.listaDePastas(req.pathVariable("email")),
 			PastaResponse.class
 		))
 		.GET("/buscaPorEmail/{email}", req ->
 			ok().body(documentoService.buscaPorEmail(req.pathVariable("email")),
 			Pessoa.class
 		))
-		.GET("/documentosNaPasta/{idPasta}", req ->
-			ok().body(documentoService.documentosNaPasta(req.pathVariable("idPasta")),
+		.GET("/documentosNaPasta/{idPasta}/{email}", req ->
+			ok().body(documentoService.documentosNaPasta(req.pathVariable("idPasta"), req.pathVariable("email")),
 			DocumentoList.class
 		))
 		.GET("/documentoArquivo/{idDocumento}", req ->
 			ok().body(documentoService.imagemDoDocumento(req.pathVariable("idDocumento")),
 				Paginas.class
+		))
+		.GET("/umaPasta/{id}", req ->
+			ok().body(documentoService.getUmaPasta(req.pathVariable("id")),
+			Pasta.class
+		))
+		.DELETE("/pasta/{id}", req ->
+			ok().body(documentoService.desativarPasta(req.pathVariable("id")),
+			Pasta.class
 		))
 		.build();
 	}

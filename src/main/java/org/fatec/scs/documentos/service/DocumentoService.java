@@ -43,12 +43,14 @@ public class DocumentoService {
 	
 	public Mono<PastaResponse> criaNovaPasta(String idUsuario, ServerRequest req){
 		return req.bodyToMono(PastaDTO.class)
-			.flatMap(pastaDTO -> pastaRepository.save(new Pasta(pastaDTO.getNome(), idUsuario, pastaDTO.getDescricao(), List.of(idUsuario))))
+			.flatMap(pastaDTO -> pastaRepository.save(new Pasta(pastaDTO.getId(), pastaDTO.getNome(), idUsuario, pastaDTO.getDescricao(), pastaDTO.getEmails())))
 			.map(pasta -> new PastaResponse(pasta));
 	}
 
-	public Flux<PastaResponse> listaDePastas(String idUsuario){
-		return pastaRepository.findByMembrosContaining(idUsuario).map(pasta -> new PastaResponse(pasta));
+	public Flux<PastaResponse> listaDePastas(String email){
+		return pastaRepository.findByMembrosContaining(email)
+				.filter(pasta -> pasta.isStatusAtivo())
+				.map(pasta -> new PastaResponse(pasta));
 	}
 
 	public Mono<Pasta> salvarDocumento(DocumentoDTO documentoDto) {
@@ -88,10 +90,22 @@ public class DocumentoService {
 				.bodyToMono(Pessoa.class);
 	}
 
-	public Flux<DocumentoList> documentosNaPasta(String idPasta){
+	public Flux<DocumentoList> documentosNaPasta(String idPasta, String email){
 		return this.pastaRepository.findById(idPasta)
 				.flatMapMany(pasta -> this.documentoRepository.findAllById(pasta.getDocumentos()))
+				.filter(documento -> documento.getAssinantes().contains(email))
 				.map(documento -> new DocumentoList(documento));
+	}
+
+	public Mono<Pasta> getUmaPasta(String id){
+		return this.pastaRepository.findById(id);
+	}
+
+	public Mono<Pasta> desativarPasta(String id) {
+		return this.pastaRepository.findById(id).flatMap(pasta -> {
+			pasta.setStatusAtivo(false);
+			return this.pastaRepository.save(pasta);
+		});
 	}
 
 	public Mono<Paginas> imagemDoDocumento(String idDocumento){

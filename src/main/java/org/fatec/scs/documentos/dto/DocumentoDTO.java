@@ -3,6 +3,7 @@ package org.fatec.scs.documentos.dto;
 import org.fatec.scs.documentos.model.Documento;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class DocumentoDTO {
     private String nome;
@@ -10,6 +11,7 @@ public class DocumentoDTO {
     private String descricao;
     private String dataHora;
     private String idPasta;
+    private List<String> assinantes;
 
     public DocumentoDTO() {
     }
@@ -19,6 +21,7 @@ public class DocumentoDTO {
         this.arquivo = documento.getArquivo();
         this.descricao = documento.getDescricao();
         this.dataHora = documento.getDataHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        this.assinantes = documento.getAssinantes();
     }
 
     public String getNome() {
@@ -59,5 +62,13 @@ public class DocumentoDTO {
 
     public void setDataHora(String dataHora) {
         this.dataHora = dataHora;
+    }
+
+    public List<String> getAssinantes() {
+        return assinantes;
+    }
+
+    public void setAssinantes(List<String> assinantes) {
+        this.assinantes = assinantes;
     }
 }
