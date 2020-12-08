@@ -8,6 +8,8 @@ import org.fatec.scs.documentos.dto.request.TreinaRequest;
 import org.fatec.scs.documentos.dto.response.DocumentoList;
 import org.fatec.scs.documentos.dto.response.PessoaDTO;
 import org.fatec.scs.documentos.handler.DocumentoHandler;
+import org.fatec.scs.documentos.model.ArquivoAssinado;
+import org.fatec.scs.documentos.model.Documento;
 import org.fatec.scs.documentos.model.Pasta;
 import org.fatec.scs.documentos.model.Pessoa;
 import org.fatec.scs.documentos.service.DocumentoService;
@@ -72,8 +74,8 @@ public class DocumentoRouter {
 			ok().body(documentoService.documentosNaPasta(req.pathVariable("idPasta"), req.pathVariable("email")),
 			DocumentoList.class
 		))
-		.GET("/documentoArquivo/{idDocumento}", req ->
-			ok().body(documentoService.imagemDoDocumento(req.pathVariable("idDocumento")),
+		.GET("/documentoArquivo/{idDocumento}/{email}", req ->
+			ok().body(documentoService.imagemDoDocumento(req.pathVariable("idDocumento"), req.pathVariable("email")),
 				Paginas.class
 		))
 		.GET("/umaPasta/{id}", req ->
@@ -83,6 +85,12 @@ public class DocumentoRouter {
 		.DELETE("/pasta/{id}", req ->
 			ok().body(documentoService.desativarPasta(req.pathVariable("id")),
 			Pasta.class
+		))
+		.POST("/assinaDocumento/{id}", req ->
+			ok().body(
+				req.bodyToMono(ArquivoAssinado.class).flatMap(arquivoAssinado ->
+					documentoService.assinaDocumento(req.pathVariable("id"), arquivoAssinado)),
+					DocumentoList.class
 		))
 		.build();
 	}

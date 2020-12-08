@@ -11,6 +11,7 @@ import org.fatec.scs.documentos.dto.response.DocumentoList;
 import org.fatec.scs.documentos.dto.response.PessoaDTO;
 import org.fatec.scs.documentos.dto.response.Reconhecimento;
 import org.fatec.scs.documentos.enums.FormatoDocumento;
+import org.fatec.scs.documentos.model.ArquivoAssinado;
 import org.fatec.scs.documentos.model.Documento;
 import org.fatec.scs.documentos.model.Pasta;
 import org.fatec.scs.documentos.model.Pessoa;
@@ -28,6 +29,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class DocumentoService {
@@ -94,7 +96,10 @@ public class DocumentoService {
 		return this.pastaRepository.findById(idPasta)
 				.flatMapMany(pasta -> this.documentoRepository.findAllById(pasta.getDocumentos()))
 				.filter(documento -> documento.getAssinantes().contains(email))
-				.map(documento -> new DocumentoList(documento));
+				.map(documento -> {
+					List<ArquivoAssinado> assinados = documento.getArquivoAssinados().stream().filter(arquivoAssinado -> arquivoAssinado.getAssinador().equals(email)).collect(Collectors.toList());
+					return new DocumentoList(documento, !assinados.isEmpty());
+				});
 	}
 
 	public Mono<Pasta> getUmaPasta(String id){
@@ -108,27 +113,41 @@ public class DocumentoService {
 		});
 	}
 
-	public Mono<Paginas> imagemDoDocumento(String idDocumento){
+	public Mono<Paginas> imagemDoDocumento(String idDocumento, String email){
 		return documentoRepository.findById(idDocumento)
 			.map(documento -> {
 				Paginas paginas = new Paginas();
-				try {
-					PDDocument document = PDDocument.load(documento.getArquivo());
-					PDFRenderer pdfRenderer = new PDFRenderer(document);
-					for (int page = 0; page < document.getNumberOfPages(); ++page) {
-						BufferedImage bim = pdfRenderer.renderImageWithDPI(
-								page, 300, ImageType.RGB);
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						ImageIO.write( bim, "png", baos);
-						baos.flush();
-						paginas.getArquivo().add(new Imagem(baos.toByteArray()));
-						baos.close();
+				List<ArquivoAssinado> assinados = documento.getArquivoAssinados().stream().filter(arquivoAssinado -> arquivoAssinado.getAssinador().equals(email)).collect(Collectors.toList());
+				if(!assinados.isEmpty()){
+					paginas.setArquivo(assinados.get(0).getArquivoAssinado().stream().map(bytes -> new Imagem(bytes)).collect(Collectors.toList()));
+					return paginas;
+				} else {
+					try {
+						PDDocument document = PDDocument.load(documento.getArquivo());
+						PDFRenderer pdfRenderer = new PDFRenderer(document);
+						for (int page = 0; page < document.getNumberOfPages(); ++page) {
+							BufferedImage bim = pdfRenderer.renderImageWithDPI(
+									page, 300, ImageType.RGB);
+							ByteArrayOutputStream baos = new ByteArrayOutputStream();
+							ImageIO.write(bim, "png", baos);
+							baos.flush();
+							paginas.getArquivo().add(new Imagem(baos.toByteArray()));
+							baos.close();
+						}
+						document.close();
+						return paginas;
+					} catch (Exception e) {
+						e.printStackTrace();
+						return paginas;
 					}
-					return paginas;
-				} catch (Exception e) {
-					e.printStackTrace();
-					return paginas;
 				}
 			});
+	}
+
+	public Mono<DocumentoList> assinaDocumento(String id, ArquivoAssinado arquivoAssinado){
+		return documentoRepository.findById(id)
+				.map(documento -> documento.addArquivoAssinado(arquivoAssinado))
+				.flatMap(documento -> documentoRepository.save(documento))
+				.map(documento -> new DocumentoList(documento));
 	}
 }

@@ -14,12 +14,19 @@ public class DocumentoList {
     public DocumentoList() {
     }
 
+    public DocumentoList(Documento documento, boolean assinado) {
+        this.id = documento.getId();
+        this.nome = documento.getNome();
+        this.descricao = documento.getDescricao();
+        this.dataHora = documento.getDataHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        this.assinado = assinado;
+    }
+
     public DocumentoList(Documento documento) {
         this.id = documento.getId();
         this.nome = documento.getNome();
         this.descricao = documento.getDescricao();
         this.dataHora = documento.getDataHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
-        this.assinado = false;
     }
 
     public String getNome() {

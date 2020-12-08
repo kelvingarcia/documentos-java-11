@@ -1,7 +1,10 @@
 package org.fatec.scs.documentos.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ArquivoAssinado {
-    private byte[] arquivoAssinado;
+    private List<byte[]> arquivoAssinado = new ArrayList<>();
     private String assinador;
 
     public String getAssinador() {
@@ -12,11 +15,11 @@ public class ArquivoAssinado {
         this.assinador = assinador;
     }
 
-    public byte[] getArquivoAssinado() {
+    public List<byte[]> getArquivoAssinado() {
         return arquivoAssinado;
     }
 
-    public void setArquivoAssinado(byte[] arquivoAssinado) {
+    public void setArquivoAssinado(List<byte[]> arquivoAssinado) {
         this.arquivoAssinado = arquivoAssinado;
     }
 }

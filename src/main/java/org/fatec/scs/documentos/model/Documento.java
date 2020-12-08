@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Document
@@ -17,8 +18,8 @@ public class Documento {
 	private LocalDateTime dataHora;
 	private String descricao;
 	private byte[] arquivo;
-	private List<ArquivoAssinado> arquivoAssinados;
-	private List<String> assinantes;
+	private List<ArquivoAssinado> arquivoAssinados = new ArrayList<>();
+	private List<String> assinantes = new ArrayList<>();
 
 	public Documento() {
 	}
@@ -85,5 +86,10 @@ public class Documento {
 
 	public void setAssinantes(List<String> assinantes) {
 		this.assinantes = assinantes;
+	}
+
+	public Documento addArquivoAssinado(ArquivoAssinado arquivoAssinado){
+		this.arquivoAssinados.add(arquivoAssinado);
+		return this;
 	}
 }
