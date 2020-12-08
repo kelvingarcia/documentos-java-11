@@ -11,11 +11,9 @@ import org.fatec.scs.documentos.dto.response.DocumentoList;
 import org.fatec.scs.documentos.dto.response.PessoaDTO;
 import org.fatec.scs.documentos.dto.response.Reconhecimento;
 import org.fatec.scs.documentos.enums.FormatoDocumento;
-import org.fatec.scs.documentos.model.ArquivoAssinado;
-import org.fatec.scs.documentos.model.Documento;
-import org.fatec.scs.documentos.model.Pasta;
-import org.fatec.scs.documentos.model.Pessoa;
+import org.fatec.scs.documentos.model.*;
 import org.fatec.scs.documentos.repository.DocumentoRepository;
+import org.fatec.scs.documentos.repository.NotificacaoRepository;
 import org.fatec.scs.documentos.repository.PastaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +37,9 @@ public class DocumentoService {
 	
 	@Autowired
 	private PastaRepository pastaRepository;
+
+	@Autowired
+	private NotificacaoRepository notificacaoRepository;
 	
 	@Autowired
 	private WebClient webClient;
@@ -160,5 +161,21 @@ public class DocumentoService {
 
 	public Mono<Documento> getDocumentoCompleto(String id){
 		return this.documentoRepository.findById(id);
+	}
+
+	public Mono<NotificacaoDTO> salvarNotificacao(NotificacaoDTO notificacaoDTO){
+		return this.pastaRepository.findById(notificacaoDTO.getIdPasta())
+				.flatMap(pasta -> this.notificacaoRepository.save(new Notificacao(pasta.getMembros(), notificacaoDTO.getTexto(), notificacaoDTO.getTipo())))
+				.map(notificacao -> new NotificacaoDTO(notificacao));
+	}
+
+	public Mono<NotificacaoDTO> salvarNotificacaoDocumento(NotificacaoDTO notificacaoDTO, String email){
+		return this.notificacaoRepository.save(new Notificacao(List.of(email), notificacaoDTO.getTexto(), notificacaoDTO.getTipo()))
+				.map(notificacao -> new NotificacaoDTO(notificacao));
+	}
+
+	public Flux<NotificacaoDTO> getNotificacoes(String email) {
+		return this.notificacaoRepository.findByMembrosContaining(email)
+				.map(notificacao -> new NotificacaoDTO(notificacao));
 	}
 }

@@ -1,6 +1,7 @@
 package org.fatec.scs.documentos.router;
 
 import org.fatec.scs.documentos.dto.DocumentoDTO;
+import org.fatec.scs.documentos.dto.NotificacaoDTO;
 import org.fatec.scs.documentos.dto.Paginas;
 import org.fatec.scs.documentos.dto.PastaResponse;
 import org.fatec.scs.documentos.dto.request.ReconheceRequest;
@@ -8,10 +9,7 @@ import org.fatec.scs.documentos.dto.request.TreinaRequest;
 import org.fatec.scs.documentos.dto.response.DocumentoList;
 import org.fatec.scs.documentos.dto.response.PessoaDTO;
 import org.fatec.scs.documentos.handler.DocumentoHandler;
-import org.fatec.scs.documentos.model.ArquivoAssinado;
-import org.fatec.scs.documentos.model.Documento;
-import org.fatec.scs.documentos.model.Pasta;
-import org.fatec.scs.documentos.model.Pessoa;
+import org.fatec.scs.documentos.model.*;
 import org.fatec.scs.documentos.service.DocumentoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -99,6 +97,20 @@ public class DocumentoRouter {
 		.GET("/getDocumento/{id}", req ->
 			ok().body(documentoService.getDocumentoCompleto(req.pathVariable("id")),
 			Documento.class
+		))
+		.POST("/notificacao", req ->
+			ok().body(req.bodyToMono(NotificacaoDTO.class).flatMap(notificacaoDTO ->
+			documentoService.salvarNotificacao(notificacaoDTO)),
+			NotificacaoDTO.class
+		))
+		.GET("/notificacoes/{email}", req ->
+			ok().body(documentoService.getNotificacoes(req.pathVariable("email")),
+			NotificacaoDTO.class
+		))
+		.POST("/notificacao/{email}", req ->
+				ok().body(req.bodyToMono(NotificacaoDTO.class).flatMap(notificacaoDTO ->
+								documentoService.salvarNotificacaoDocumento(notificacaoDTO, req.pathVariable("email"))),
+					NotificacaoDTO.class
 		))
 		.build();
 	}
