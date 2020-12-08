@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class DocumentoDTO {
+    private String id;
     private String nome;
     private byte[] arquivo;
     private String descricao;
@@ -70,5 +71,13 @@ public class DocumentoDTO {
 
     public void setAssinantes(List<String> assinantes) {
         this.assinantes = assinantes;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

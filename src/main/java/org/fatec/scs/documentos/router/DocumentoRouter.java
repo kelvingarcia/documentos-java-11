@@ -92,6 +92,14 @@ public class DocumentoRouter {
 					documentoService.assinaDocumento(req.pathVariable("id"), arquivoAssinado)),
 					DocumentoList.class
 		))
+		.DELETE("/documento/{id}", req ->
+			ok().body(documentoService.desativaDocumento(req.pathVariable("id")),
+				DocumentoList.class
+		))
+		.GET("/getDocumento/{id}", req ->
+			ok().body(documentoService.getDocumentoCompleto(req.pathVariable("id")),
+			Documento.class
+		))
 		.build();
 	}
 }

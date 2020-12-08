@@ -95,7 +95,7 @@ public class DocumentoService {
 	public Flux<DocumentoList> documentosNaPasta(String idPasta, String email){
 		return this.pastaRepository.findById(idPasta)
 				.flatMapMany(pasta -> this.documentoRepository.findAllById(pasta.getDocumentos()))
-				.filter(documento -> documento.getAssinantes().contains(email))
+				.filter(documento -> documento.getAssinantes().contains(email) && documento.isStatusAtivo())
 				.map(documento -> {
 					List<ArquivoAssinado> assinados = documento.getArquivoAssinados().stream().filter(arquivoAssinado -> arquivoAssinado.getAssinador().equals(email)).collect(Collectors.toList());
 					return new DocumentoList(documento, !assinados.isEmpty());
@@ -149,5 +149,16 @@ public class DocumentoService {
 				.map(documento -> documento.addArquivoAssinado(arquivoAssinado))
 				.flatMap(documento -> documentoRepository.save(documento))
 				.map(documento -> new DocumentoList(documento));
+	}
+
+	public Mono<DocumentoList> desativaDocumento(String idDocumento) {
+		return this.documentoRepository.findById(idDocumento).flatMap(documento -> {
+			documento.setStatusAtivo(false);
+			return this.documentoRepository.save(documento);
+		}).map(documento -> new DocumentoList(documento));
+	}
+
+	public Mono<Documento> getDocumentoCompleto(String id){
+		return this.documentoRepository.findById(id);
 	}
 }

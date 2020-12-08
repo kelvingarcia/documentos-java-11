@@ -20,11 +20,13 @@ public class Documento {
 	private byte[] arquivo;
 	private List<ArquivoAssinado> arquivoAssinados = new ArrayList<>();
 	private List<String> assinantes = new ArrayList<>();
+	private boolean statusAtivo = true;
 
 	public Documento() {
 	}
 
 	public Documento(DocumentoDTO documentoDTO){
+		this.id = documentoDTO.getId();
 		this.nome = documentoDTO.getNome();
 		this.descricao = documentoDTO.getDescricao();
 		this.arquivo = documentoDTO.getArquivo();
@@ -91,5 +93,13 @@ public class Documento {
 	public Documento addArquivoAssinado(ArquivoAssinado arquivoAssinado){
 		this.arquivoAssinados.add(arquivoAssinado);
 		return this;
+	}
+
+	public boolean isStatusAtivo() {
+		return statusAtivo;
+	}
+
+	public void setStatusAtivo(boolean statusAtivo) {
+		this.statusAtivo = statusAtivo;
 	}
 }
